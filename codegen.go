@@ -94,6 +94,9 @@ func generateModel(dbName, tName string, schema drivers.TableSchema, config Code
 			needTime = true
 		}
 		if field.IsPrimaryKey {
+			if strings.Contains(field.Name, "Id") {
+				field.Name = "ID"
+			}
 			model.PrimaryFields = append(model.PrimaryFields, &field)
 		}
 
