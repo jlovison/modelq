@@ -91,8 +91,48 @@ func (p PostgresDriver) queryPrimaryKeys(db *gmq.Db, dbName string, tables strin
 	return pKeys, nil
 }
 
+func (p PostgresDriver) queryUniqueKeys(db *gmq.Db, dbName string, tables string) (StringSet, error) {
+	// FIXME: if we have implemented the JOIN
+	pKeys := make(StringSet)
+
+	tcObjs := postgres.TableConstraintsObjs
+	kcuObjs := postgres.KeyColumnUsageObjs
+	tcFilter := tcObjs.FilterTableSchema("=", dbName).And(tcObjs.FilterConstraintType("=", "UNIQUE"))
+	kcuFilter := kcuObjs.FilterTableSchema("=", dbName)
+	if len(tables) > 0 {
+		tableVs := strings.Split(tables, ",")
+		tcFilter = tcFilter.And(tcObjs.FilterTableName("IN", tableVs[0], tableVs[1:]...))
+		kcuFilter = kcuFilter.And(kcuObjs.FilterTableName("IN", tableVs[0], tableVs[1:]...))
+	}
+
+	tcJoinKeys := make(StringSet)
+	err := tcObjs.Select().Where(tcFilter).Iterate(db, func(tc postgres.TableConstraints) bool {
+		key := fmt.Sprintf("%s.%s", tc.TableName, tc.ConstraintName)
+		tcJoinKeys[key] = struct{}{}
+		return true
+	})
+	if err != nil {
+		return pKeys, err
+	}
+
+	err = kcuObjs.Select().Where(kcuFilter).Iterate(db, func(kcu postgres.KeyColumnUsage) bool {
+		key := fmt.Sprintf("%s.%s", kcu.TableName, kcu.ConstraintName)
+		if _, ok := tcJoinKeys[key]; ok {
+			pkey := fmt.Sprintf("%s.%s", kcu.TableName, kcu.ColumnName)
+			pKeys[pkey] = struct{}{}
+		}
+		return true
+	})
+	if err != nil {
+		return pKeys, err
+	}
+
+	return pKeys, nil
+}
+
 func (p PostgresDriver) queryColumns(db *gmq.Db, dbName string, tables string, dbSchema DbSchema) error {
 	pKeys, err := p.queryPrimaryKeys(db, dbName, tables)
+	uKeys, err := p.queryUniqueKeys(db, dbName, tables)
 	if err != nil {
 		return err
 	}
@@ -116,6 +156,8 @@ func (p PostgresDriver) queryColumns(db *gmq.Db, dbName string, tables string, d
 		columnKey := fmt.Sprintf("%s.%s", col.TableName, col.ColumnName)
 		if _, ok := pKeys[columnKey]; ok {
 			columnKey = "PRI"
+		} else if _, ok := uKeys[columnKey]; ok {
+			columnKey = "UNI"
 		}
 		sCol := Column{
 			Schema:       col.TableSchema,
