@@ -69,7 +69,7 @@ func generateModel(dbName, tName string, schema drivers.TableSchema, config Code
 	}()
 
 	model := ModelMeta{
-		Name:      toCapitalCase(tName),
+		Name:      strings.TrimSuffix(toCapitalCase(tName), "s"),
 		DbName:    dbName,
 		TableName: tName,
 		Fields:    make([]ModelField, len(schema)),
