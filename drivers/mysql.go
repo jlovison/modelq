@@ -4,8 +4,8 @@ import (
 	"log"
 	"strings"
 
-	"github.com/mijia/modelq/drivers/mysql"
-	"github.com/mijia/modelq/gmq"
+	"github.com/jlovison/modelq/drivers/mysql"
+	"github.com/jlovison/modelq/gmq"
 )
 
 type MysqlDriver struct{}
