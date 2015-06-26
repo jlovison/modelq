@@ -9,7 +9,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/mijia/modelq/drivers"
+	"github.com/jlovison/modelq/drivers"
 )
 
 type CodeResult struct {
