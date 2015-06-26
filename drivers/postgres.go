@@ -132,7 +132,13 @@ func (p PostgresDriver) queryUniqueKeys(db *gmq.Db, dbName string, tables string
 
 func (p PostgresDriver) queryColumns(db *gmq.Db, dbName string, tables string, dbSchema DbSchema) error {
 	pKeys, err := p.queryPrimaryKeys(db, dbName, tables)
+	log.Printf("pKeys: %v", pKeys)
+	if err != nil {
+		return err
+	}
+	
 	uKeys, err := p.queryUniqueKeys(db, dbName, tables)
+	log.Printf("uKeys: %v", uKeys)
 	if err != nil {
 		return err
 	}
