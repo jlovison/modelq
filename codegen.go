@@ -79,7 +79,7 @@ func generateModel(dbName, tName string, schema drivers.TableSchema, config Code
 	needTime := false
 	for i, col := range schema {
 		field := ModelField{
-			Name:            toCapitalCase(col.ColumnName),
+			Name:            strings.TrimPrefix(toCapitalCase(col.ColumnName), model.Name),
 			ColumnName:      col.ColumnName,
 			Type:            col.DataType,
 			JsonMeta:        fmt.Sprintf("`json:\"%s\"`", col.ColumnName),
