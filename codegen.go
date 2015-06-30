@@ -154,6 +154,10 @@ func (f ModelField) ConverterFuncName() string {
 	return "AsString"
 }
 
+func (f *ModelField) IsSecret() bool {
+	return strings.Contains(strings.ToLower(f.Name), "password")
+}
+
 type PrimaryFields []*ModelField
 
 func (pf PrimaryFields) FormatObject() func(string) string {
