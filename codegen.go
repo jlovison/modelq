@@ -30,7 +30,7 @@ func (cc CodeConfig) MustCompileTemplate() *template.Template {
 	return template.Must(template.ParseFiles(cc.template))
 }
 
-func generateModels(dbName string, dbSchema drivers.DbSchema, config CodeConfig) {
+func generateModels(dbName string, dbSchema drivers.DbSchema, config CodeConfig, fileSuffix string) {
 	customTmpl := config.MustCompileTemplate()
 
 	if fs, err := os.Stat(config.packageName); err != nil || !fs.IsDir() {
@@ -40,7 +40,7 @@ func generateModels(dbName string, dbSchema drivers.DbSchema, config CodeConfig)
 	jobs := make(chan CodeResult)
 	for tbl, cols := range dbSchema {
 		go func(tableName string, schema drivers.TableSchema) {
-			err := generateModel(dbName, tableName, schema, config, customTmpl)
+			err := generateModel(dbName, tableName, schema, config, customTmpl, fileSuffix)
 			jobs <- CodeResult{tableName, err}
 		}(tbl, cols)
 	}
@@ -56,7 +56,7 @@ func generateModels(dbName string, dbSchema drivers.DbSchema, config CodeConfig)
 	close(jobs)
 }
 
-func generateModel(dbName, tName string, schema drivers.TableSchema, config CodeConfig, tmpl *template.Template) error {
+func generateModel(dbName, tName string, schema drivers.TableSchema, config CodeConfig, tmpl *template.Template, fileSuffix string) error {
 	file, err := os.Create(path.Join(config.packageName, tName+fileSuffix))
 	if err != nil {
 		return err

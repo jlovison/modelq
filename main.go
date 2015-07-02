@@ -65,7 +65,7 @@ func main() {
 		template:       tmplName,
 	}
 	codeConfig.MustCompileTemplate()
-	generateModels(schemaName, dbSchema, *codeConfig)
+	generateModels(schemaName, dbSchema, *codeConfig, fileSuffix)
 	formatCodes(packageName)
 }
 
