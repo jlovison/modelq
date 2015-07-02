@@ -9,13 +9,13 @@ import (
 	"runtime"
 
 	_ "github.com/go-sql-driver/mysql"
-	_ "github.com/lib/pq"
 	"github.com/jlovison/modelq/drivers"
 	"github.com/jlovison/modelq/gmq"
+	_ "github.com/lib/pq"
 )
 
 func main() {
-	var targetDb, tableNames, packageName string
+	var targetDb, tableNames, packageName, fileSuffix string
 	var tmplName string
 	var driver, schemaName string
 	var touchTimestamp bool
@@ -25,6 +25,7 @@ func main() {
 	flag.StringVar(&packageName, "pkg", "", "Go source code package for generated models")
 	flag.StringVar(&driver, "driver", "mysql", "Current supported drivers include mysql, postgres")
 	flag.StringVar(&schemaName, "schema", "", "Schema for postgresql, database name for mysql")
+	flag.StringVar(&fileSuffix, "suffix", "_gen.go", "Suffix that should be used for the files generated (default: \"_gen.go\")")
 	flag.BoolVar(&touchTimestamp, "dont-touch-timestamp", false, "Should touch the datetime fields with default value or on update")
 	flag.StringVar(&tmplName, "template", "", "Passing the template to generate code, or use the default one")
 	flag.IntVar(&pCount, "p", 4, "Parallell running for code generator")

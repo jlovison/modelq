@@ -57,7 +57,7 @@ func generateModels(dbName string, dbSchema drivers.DbSchema, config CodeConfig)
 }
 
 func generateModel(dbName, tName string, schema drivers.TableSchema, config CodeConfig, tmpl *template.Template) error {
-	file, err := os.Create(path.Join(config.packageName, tName+"_gen.go"))
+	file, err := os.Create(path.Join(config.packageName, tName+fileSuffix))
 	if err != nil {
 		return err
 	}
