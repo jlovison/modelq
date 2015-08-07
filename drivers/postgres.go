@@ -42,6 +42,7 @@ func (p PostgresDriver) dataType(dt string) string {
 		"text":      "string",
 		"timestamp": "time.Time",
 		"numeric":   "float64",
+		"double":    "float64", // Due to the split below, we're just using the first word of the double precison type
 		"boolean":   "bool",
 	}
 	dt = strings.Split(dt, " ")[0]
@@ -136,7 +137,7 @@ func (p PostgresDriver) queryColumns(db *gmq.Db, dbName string, tables string, d
 	if err != nil {
 		return err
 	}
-	
+
 	uKeys, err := p.queryUniqueKeys(db, dbName, tables)
 	log.Printf("uKeys: %v", uKeys)
 	if err != nil {
