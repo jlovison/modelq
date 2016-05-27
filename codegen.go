@@ -68,8 +68,15 @@ func generateModel(dbName, tName string, schema drivers.TableSchema, config Code
 		file.Close()
 	}()
 
+	var adjustedName string
+	if adjustedName = strings.TrimSuffix(toCapitalCase(tName), "ies"); adjustedName != toCapitalCase(tName) {
+		adjustedName += "y"
+	} else {
+		adjustedName = strings.TrimSuffix(toCapitalCase(tName), "s")
+	}
+
 	model := ModelMeta{
-		Name:      strings.TrimSuffix(toCapitalCase(tName), "s"),
+		Name:      adjustedName,
 		DbName:    dbName,
 		TableName: tName,
 		Fields:    make([]ModelField, len(schema)),
